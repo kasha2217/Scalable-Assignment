@@ -1,14 +1,36 @@
 const Quote = require("../models/quotes");
 
+const adminLogin = async (req, res) => {
+  const { username, password } = req.body;
+
+  //hardcoded admin login
+  if (username === "admin" && password === "password123") {
+    const jwt = require("jsonwebtoken");
+    const token = jwt.sign(
+      { username, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    console.log('JWT_SECRET during sign:', process.env.JWT_SECRET);
+    return res.json({ token });
+  } else {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+};
+
 const createQuote = async (req, res) => {
-  const body = req.body;
-  const newQuote = new Quote({
-    author: body.author,
-    category: body.category,
-    quote: body.quote,
-  });
-  await newQuote.save();
-  res.status(201).json({ message: "created successfully", id: newQuote._id });
+  try {
+    const body = req.body;
+    const newQuote = new Quote({
+      author: body.author,
+      category: body.category,
+      quote: body.quote,
+    });
+    await newQuote.save();
+    res.status(201).json({ message: "created successfully", id: newQuote._id });
+  } catch (err) {
+    res.status(500).json({ message: "Server error!" });
+  }
 };
 
 const getAllQuotes = async (req, res) => {
@@ -33,11 +55,11 @@ const deleteQuote = async (req, res) => {
     if (!deletedQuote) {
       return res.status(404).json({ message: "Quote not found!" });
     }
-
+   
     return res.json({ message: "Quote deleted successfully!" });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 };
 
-module.exports = { getAllQuotes, createQuote, deleteQuote };
+module.exports = { adminLogin, getAllQuotes, createQuote, deleteQuote };
