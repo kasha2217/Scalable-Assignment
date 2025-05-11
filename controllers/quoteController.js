@@ -11,7 +11,6 @@ const adminLogin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    console.log('JWT_SECRET during sign:', process.env.JWT_SECRET);
     return res.json({ token });
   } else {
     return res.status(401).json({ message: "Invalid credentials" });
